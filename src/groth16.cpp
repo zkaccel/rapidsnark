@@ -170,7 +170,8 @@ std::unique_ptr<Proof<Engine>> Prover<Engine>::prove(typename Engine::FrElement 
 
     LOG_TRACE("Start Multiexp H");
     typename Engine::G1Point pih;
-    E.g1.multiMulByScalar(pih, pointsH, (uint8_t *)a, sizeof(a[0]), domainSize);
+    if (getenv("INACCEL_DISABLE_FF_MULTIEXP_ALT_BN128_G1")) E.g1.multiMulByScalar(pih, pointsH, (uint8_t *)a, sizeof(a[0]), domainSize);
+    else E.g1.multiMulByScalarG1InAccel(pih, pointsH, (uint8_t *)a, sizeof(a[0]), domainSize);
     std::ostringstream ss1;
     ss1 << "pih: " << E.g1.toString(pih);
     LOG_DEBUG(ss1);
@@ -180,28 +181,32 @@ std::unique_ptr<Proof<Engine>> Prover<Engine>::prove(typename Engine::FrElement 
     LOG_TRACE("Start Multiexp A");
     uint32_t sW = sizeof(wtns[0]);
     typename Engine::G1Point pi_a;
-    E.g1.multiMulByScalar(pi_a, pointsA, (uint8_t *)wtns, sW, nVars);
+    if (getenv("INACCEL_DISABLE_FF_MULTIEXP_ALT_BN128_G1")) E.g1.multiMulByScalar(pi_a, pointsA, (uint8_t *)wtns, sW, nVars);
+    else E.g1.multiMulByScalarG1InAccel(pi_a, pointsA, (uint8_t *)wtns, sW, nVars);
     std::ostringstream ss2;
     ss2 << "pi_a: " << E.g1.toString(pi_a);
     LOG_DEBUG(ss2);
 
     LOG_TRACE("Start Multiexp B1");
     typename Engine::G1Point pib1;
-    E.g1.multiMulByScalar(pib1, pointsB1, (uint8_t *)wtns, sW, nVars);
+    if (getenv("INACCEL_DISABLE_FF_MULTIEXP_ALT_BN128_G1")) E.g1.multiMulByScalar(pib1, pointsB1, (uint8_t *)wtns, sW, nVars);
+    else E.g1.multiMulByScalarG1InAccel(pib1, pointsB1, (uint8_t *)wtns, sW, nVars);
     std::ostringstream ss3;
     ss3 << "pib1: " << E.g1.toString(pib1);
     LOG_DEBUG(ss3);
 
     LOG_TRACE("Start Multiexp B2");
     typename Engine::G2Point pi_b;
-    E.g2.multiMulByScalar(pi_b, pointsB2, (uint8_t *)wtns, sW, nVars);
+    if (getenv("INACCEL_DISABLE_FF_MULTIEXP_ALT_BN128_G2")) E.g2.multiMulByScalar(pi_b, pointsB2, (uint8_t *)wtns, sW, nVars);
+    else E.g2.multiMulByScalarG2InAccel(pi_b, pointsB2, (uint8_t *)wtns, sW, nVars);
     std::ostringstream ss4;
     ss4 << "pi_b: " << E.g2.toString(pi_b);
     LOG_DEBUG(ss4);
 
     LOG_TRACE("Start Multiexp C");
     typename Engine::G1Point pi_c;
-    E.g1.multiMulByScalar(pi_c, pointsC, (uint8_t *)((uint64_t)wtns + (nPublic +1)*sW), sW, nVars-nPublic-1);
+    if (getenv("INACCEL_DISABLE_FF_MULTIEXP_ALT_BN128_G1")) E.g1.multiMulByScalar(pi_c, pointsC, (uint8_t *)((uint64_t)wtns + (nPublic +1)*sW), sW, nVars-nPublic-1);
+    else E.g1.multiMulByScalarG1InAccel(pi_c, pointsC, (uint8_t *)((uint64_t)wtns + (nPublic +1)*sW), sW, nVars-nPublic-1);
     std::ostringstream ss5;
     ss5 << "pi_c: " << E.g1.toString(pi_c);
     LOG_DEBUG(ss5);
